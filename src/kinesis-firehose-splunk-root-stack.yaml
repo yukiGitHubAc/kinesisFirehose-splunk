@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "root stack for Kinesis firehose application template."
+Mappings:
+  ResourceArnMapping:
+    cfn:
+      templateURL: ###NESTED_TEMPLATE_YAML###
+    s3:
+      bucketArn: ###BUCKET_ARN###
+    splunk:
+      HECEndpointURL: ###CEC_ENDPOINT_URL###
+      HECToken: ###HEC_TOKEN###
+    lambda:
+      lambdaArn: ###LAMBDA_ARN###
+    cwl:
+      logGroupName: "KinesisFirehose"
+Resources:
+  nestedStack1:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      TemplateURL: !FindInMap [ ResourceArnMapping, cfn, templateURL ]
+      Parameters:
+        S3bucketArn: !FindInMap [ ResourceArnMapping, s3, bucketArn ]
+        OutputLogGroup: !FindInMap [ ResourceArnMapping, cwl, logGroupName ]
+        HECEndpointURL: !FindInMap [ ResourceArnMapping, splunk, HECEndpointURL ]
+        HECToken: !FindInMap [ ResourceArnMapping, splunk, HECToken ]
+        ProcessingLambdaArn: !FindInMap [ ResourceArnMapping, lambda, lambdaArn ]
